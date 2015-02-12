@@ -15,13 +15,13 @@ type config struct {
 	name   string
 	version string
 	trigger string
-	fullserver string
 }
 
 func messageParser(msg string, conf config) string {
-	if string(msg[0]) == conf.trigger {
+	if len(msg) > 0 && string(msg[0]) == conf.trigger {
 		return "TRIGGER WARNING"
 	}
+
 	return ""
 }
 
@@ -35,18 +35,17 @@ func main() {
 		version: "Pump-19 0.01. A go driven hydraulics golem",
 		trigger: ".",
 	}
-	conf.fullserver = conf.server+":"+strconv.Itoa(conf.port);
 
 	bot := irc.IRC(conf.nick, conf.name)
 	bot.VerboseCallbackHandler = true
 	bot.Debug                  = true
-	if conf.ssl {
-		bot.UseTLS                 = true
-		bot.TLSConfig              = &tls.Config{InsecureSkipVerify: true}
-	}
 	bot.Version                = conf.version
+	if conf.ssl {
+		bot.UseTLS         = true
+		bot.TLSConfig      = &tls.Config{InsecureSkipVerify: true}
+	}
 
-	err := bot.Connect(conf.fullserver)
+	err := bot.Connect(conf.server+":"+strconv.Itoa(conf.port))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -54,10 +53,9 @@ func main() {
 	bot.AddCallback("001", func(e *irc.Event) { bot.Join("#neoplastic") })
 
 	bot.AddCallback("PRIVMSG", func(e *irc.Event) {
-		parser := string(e.Arguments[1])
-		//slice  := []byte(parser)
+		msg := string(e.Arguments[1])
 		go func() {
-			s := messageParser(parser, conf)
+			s := messageParser(msg, conf)
 			if s != "" { bot.Privmsg(e.Arguments[0], s) }
 		}()
 	})
