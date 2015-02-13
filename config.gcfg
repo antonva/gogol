@@ -1,0 +1,8 @@
+[bot]
+server  = irc.rizon.net
+port    = 6697
+ssl     = true 
+nick    = Mr-Pump
+name    = Pump-19
+trigger = .
+

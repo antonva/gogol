@@ -1,24 +1,15 @@
 package main
 
-import ( 
+import (
+	"code.google.com/p/gcfg"
 	"github.com/thoj/go-ircevent"
 	"crypto/tls"
 	"strconv"
 	"fmt"
 )
 
-type config struct {
-	server string
-	ssl    bool
-	port   int
-	nick   string
-	name   string
-	version string
-	trigger string
-}
-
-func messageParser(msg string, conf config) string {
-	if len(msg) > 0 && string(msg[0]) == conf.trigger {
+func messageParser(msg string, conf Config) string {
+	if len(msg) > 0 && string(msg[0]) == conf.Bot.Trigger {
 		return "TRIGGER WARNING"
 	}
 
@@ -26,26 +17,22 @@ func messageParser(msg string, conf config) string {
 }
 
 func main() {
-	conf := config {
-		server:  "irc.rizon.net",
-		ssl:     true,
-		port:    6697,
-		nick:    "Mr-Pump",
-		name:    "Pump-19",
-		version: "Pump-19 0.01. A go driven hydraulics golem",
-		trigger: ".",
+	var conf Config
+	err := gcfg.ReadFileInto(&conf, "config")
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	bot := irc.IRC(conf.nick, conf.name)
+	bot := irc.IRC(conf.Bot.Nick, conf.Bot.Name)
 	bot.VerboseCallbackHandler = true
 	bot.Debug                  = true
-	bot.Version                = conf.version
-	if conf.ssl {
+	bot.Version                = "Pump-19 0.01. A go driven hydraulics golem"
+	if conf.Bot.Ssl {
 		bot.UseTLS         = true
 		bot.TLSConfig      = &tls.Config{InsecureSkipVerify: true}
 	}
 
-	err := bot.Connect(conf.server+":"+strconv.Itoa(conf.port))
+	err = bot.Connect(conf.Bot.Server+":"+strconv.Itoa(conf.Bot.Port))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
