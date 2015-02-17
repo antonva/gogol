@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 type Msg struct {
 	Nick    string
 	Channel string
@@ -24,7 +20,6 @@ func (m *Msgbuf) Append(nick string, channel string, message string) {
 		m.Buffer = m.Buffer[1:]
 	}
 	m.Buffer = append(m.Buffer, tmp)
-	fmt.Println(m.Buffer)
 }
 
 func (m Msg) String() string {

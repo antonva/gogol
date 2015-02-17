@@ -7,7 +7,6 @@ import (
 	"log"
 	"code.google.com/p/gcfg"
 	"github.com/thoj/go-ircevent"
-	"fmt"
 )
 
 func messageParser(e *irc.Event, conf Config, buffer *Msgbuf) string {
@@ -19,13 +18,28 @@ func messageParser(e *irc.Event, conf Config, buffer *Msgbuf) string {
 		if string(msg[0]) == conf.Bot.Trigger {
 			split := strings.Split(msg[1:], " ")
 			return split[0]
-		/*TODO: split into own function/plugin.*/
+	/*
+	 * Sed style replace on last line spoken
+	 * TODO: split into own function/plugin.
+	 * TODO: refactor so you can correct others.
+	 */
 		} else if string(msg[0:2]) == "s/" {
+			for i := len(buffer.Buffer)-2; i >= 0; i-- {
+				if nick == buffer.Buffer[i].Nick {
+					find_replace := strings.Split(msg[2:], "/")
+					if len(find_replace) > 1 {
+						return "I think you meant: " +
+						strings.Replace(buffer.Buffer[i].Message,
+						find_replace[0], find_replace[1], 1)
+					}
+					break
+				}
+			}
 		}
 	}
-	fmt.Println(buffer.Buffer)
 	return ""
 }
+
 
 func configParser(conf Config) {
 }
