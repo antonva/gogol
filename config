@@ -5,4 +5,6 @@
     nick    = Mr-Pump
     name    = Pump-19
     trigger = .
-
+    debug   = false
+    verbosedebug  = true
+    

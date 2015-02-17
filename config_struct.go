@@ -3,11 +3,13 @@ package main
 
 type Config struct {
 	Bot struct {
-		Server string
-		Ssl    bool
-		Port   int
-		Nick   string
-		Name   string
-		Trigger string
+		Debug        bool
+		Ssl          bool
+		VerboseDebug bool
+		Port         int
+		Name         string
+		Nick         string
+		Server       string
+		Trigger      string
 	}
 }
