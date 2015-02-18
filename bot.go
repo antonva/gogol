@@ -7,6 +7,7 @@ import (
 	"log"
 	"code.google.com/p/gcfg"
 	"github.com/thoj/go-ircevent"
+	"github.com/aarzilli/golua/lua"
 )
 
 func messageParser(e *irc.Event, conf Config, buffer *Msgbuf) string {
@@ -41,19 +42,29 @@ func messageParser(e *irc.Event, conf Config, buffer *Msgbuf) string {
 }
 
 
-func configParser(conf Config) {
-}
 
 func main() {
+	/* 
+	 * The bot's message buffer.
+	 * TODO: Move Buflength to config.
+	 */
+	buffer :=  Msgbuf{Buflength: 512}
+
+	/* Config parsing */
 	var conf Config
-	//configParser(conf)
 	err := gcfg.ReadFileInto(&conf, "config")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	/* Plugin */
+	L := lua.NewState()
+	L.OpenLibs()
+	defer L.Close()
+
+	err = L.DoString("print(\"Hello world\")")
 	var plugin PluginContainer
 	plugin.list = make(map[string]func(string) string)
-	buffer :=  Msgbuf{Buflength: 512}
 
 	con := irc.IRC(conf.Bot.Nick, conf.Bot.Name)
 	con.VerboseCallbackHandler = conf.Bot.VerboseDebug
