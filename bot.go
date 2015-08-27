@@ -1,50 +1,35 @@
 package main
 
 import (
-    "fmt"
-    "io/ioutil"
-    "os/exec"
     "os/user"
 	"crypto/tls"
 	"strconv"
     "strings"
 	"log"
-    "bytes"
 	"time"
 	"gopkg.in/gcfg.v1"
 	"github.com/thoj/go-ircevent"
-//    "github.com/antonva/mr-pump/plugins"
+    "github.com/antonva/gogol/plugins"
 )
 
-func messageParser(e *irc.Event, conf Config, buffer *Msgbuf) string {
+func messageParser(e *irc.Event, conf Config, buffer *Msgbuf, p *plugins.Plugins) string {
 	msg := string(e.Arguments[1])
 	nick := string(e.Nick)
 	channel := string(e.Arguments[0])
 	buffer.Append(nick, channel, msg)
 	if len(msg) > 1 {
-        pluginLoader()
 		if string(msg[0]) == conf.Bot.Trigger {
 			split := strings.Split(msg[1:], " ")
-            cmd := exec.Command("echo", split[0])
-            var out bytes.Buffer
-            cmd.Stdout = &out
-            err := cmd.Run()
-            if err != nil {
-                log.Fatal(err)
-            }
-			return out.String()
+            reply := p.Call(split[0])
+			return reply
         }
     }
 	return ""
 }
 
-func pluginLoader() []string {
-    p := []string{}
-    plugins, _ := ioutil.ReadDir("./")
-    for _,f := range plugins {
-        p = append(p, f.Name()[0:len(f.Name())-2])
-    }
-
+func loadPlugins() *plugins.Plugins {
+    p := plugins.NewPlugins()
+    p.Register()
     return p
 }
 
@@ -66,9 +51,7 @@ func main() {
 	buffer :=  Msgbuf{Buflength: 512}
     minversion := "0.1"
     conf := loadConfig()
-
-	var plugin PluginContainer
-	plugin.list = make(map[string]func(string) string)
+    plugins := loadPlugins()
 
 	con := irc.IRC(conf.Bot.Nick, conf.Bot.Name)
 	con.VerboseCallbackHandler = conf.Bot.VerboseDebug
@@ -96,9 +79,10 @@ func main() {
 	})
 
 	con.AddCallback("PRIVMSG", func(e *irc.Event) {
-        fmt.Println(conf.Bot.Channels)
-		s := messageParser(e, conf, &buffer)
-		if s != "" { con.Privmsg(e.Arguments[0], s) }
+		go func() {
+            s := messageParser(e, conf, &buffer, plugins)
+            if s != "" { con.Privmsg(e.Arguments[0], s) }
+        }()
 	})
 
 	con.Loop()
