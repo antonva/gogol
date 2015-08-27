@@ -1,8 +1,6 @@
 package plugins
 
 import (
-    "fmt"
-    "strings"
     "unicode"
     "reflect"
 )
@@ -35,26 +33,27 @@ func (p *Plugins) Register() string {
             }
         }
     }
-    fmt.Println(p.List)
     return "Ok."
 }
 
 // We check if th function is in our precompiled list of plugins then use reflect to 
 // be able to call the corresponding method via a string call. Since we have to export the 
 // methods, we change the first char of string s to uppercase.
-func (p *Plugins) Call(s string) string {
-    u := []rune(s)
+func (p *Plugins) Call(s []string) []string {
+    u := []rune(s[0])
     u[0] = unicode.ToUpper(u[0])
-    s = string(u)
+    s[0] = string(u)
     for _, e := range p.List {
-        if s == e {
-            methodValue := reflect.ValueOf(p).MethodByName(s).Call([]reflect.Value{})
+        if s[0] == e {
+            in := make([]reflect.Value, 1)
+            in[0] = reflect.ValueOf(s)
+            methodValue := reflect.ValueOf(p).MethodByName(s[0]).Call(in)
             var ret []string
-            for _, v := range methodValue {
-                ret = append(ret, v.String())
+            for i := 0; i < methodValue[0].Len(); i++ {
+                ret = append(ret, methodValue[0].Index(i).String())
             }
-            return strings.Join(ret, " ")
+            return ret
         }
     }
-    return ""
+    return []string{}
 }

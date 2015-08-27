@@ -12,7 +12,7 @@ import (
     "github.com/antonva/gogol/plugins"
 )
 
-func messageParser(e *irc.Event, conf Config, buffer *Msgbuf, p *plugins.Plugins) string {
+func messageParser(e *irc.Event, conf Config, buffer *Msgbuf, p *plugins.Plugins) []string {
 	msg := string(e.Arguments[1])
 	nick := string(e.Nick)
 	channel := string(e.Arguments[0])
@@ -20,11 +20,11 @@ func messageParser(e *irc.Event, conf Config, buffer *Msgbuf, p *plugins.Plugins
 	if len(msg) > 1 {
 		if string(msg[0]) == conf.Bot.Trigger {
 			split := strings.Split(msg[1:], " ")
-            reply := p.Call(split[0])
+            reply := p.Call(split)
 			return reply
         }
     }
-	return ""
+	return []string{}
 }
 
 func loadPlugins() *plugins.Plugins {
@@ -81,7 +81,11 @@ func main() {
 	con.AddCallback("PRIVMSG", func(e *irc.Event) {
 		go func() {
             s := messageParser(e, conf, &buffer, plugins)
-            if s != "" { con.Privmsg(e.Arguments[0], s) }
+            if len(s) > 0 {
+                for _, el := range s {
+                    con.Privmsg(e.Arguments[0], el)
+                }
+            }
         }()
 	})
 
