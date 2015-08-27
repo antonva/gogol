@@ -1,10 +1,13 @@
 [bot]
-    server  = irc.rizon.net
-    port    = 6697
-    ssl     = true 
-    nick    = Mr-Pump
-    name    = Pump-19
-    trigger = .
-    debug   = false
-    verbosedebug  = true
+    server   = irc.rizon.net
+    port     = 6697
+    ssl      = true 
+    channels = "#hlidskjalf"
+    channels = "#hlidskjalf2"
+    nick     = gogol
+    name     = OedoCyberPoliceOfficer
+    password = 
+    trigger  = .
+    debug    = true
+    verbosedebug  = false
     
