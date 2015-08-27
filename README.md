@@ -1,4 +1,4 @@
-# Denton
+# Gogol
 A modular irc bot written in Go.
 
 The idea is for a stable set of core functions while the majority of functionality
@@ -12,6 +12,7 @@ would be offloaded to drop-in golang plugins.
     - Consider dropping trigger functionality for bot name utterance pattern instead.
   - [ ] Help functionality. 
   - [ ] Admin interface.
+  - [x] Multiline Support.
 - Documentation:
   - [ ] Codebase.
   - [ ] Plugin interface.
