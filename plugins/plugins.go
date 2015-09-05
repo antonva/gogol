@@ -15,6 +15,7 @@ type Plugins struct {
 func NewPlugins() *Plugins {
     p := new(Plugins)
     p.InternalFuncs = []string{"Register", "Call"}
+    p.Register()
     return p
 }
 
@@ -36,7 +37,7 @@ func (p *Plugins) Register() string {
     return "Ok."
 }
 
-// We check if th function is in our precompiled list of plugins then use reflect to 
+// We check if the function is in our precompiled list of plugins then use reflect to 
 // be able to call the corresponding method via a string call. Since we have to export the 
 // methods, we change the first char of string s to uppercase.
 func (p *Plugins) Call(s []string) []string {

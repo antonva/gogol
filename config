@@ -8,6 +8,6 @@
     name     = OedoCyberPoliceOfficer
     password = 
     trigger  = .
-    debug    = true
-    verbosedebug  = false
+    debug    = false
+    verbosedebug  = true
     
