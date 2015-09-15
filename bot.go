@@ -29,7 +29,7 @@ func messageParser(e *irc.Event, conf Config, buffer *Msgbuf, p *plugins.Plugins
     return []string{}
 }
 
-// Looks for a config file in $HOME/.config/denton/config as per the XDG spec.
+// Looks for a config file in $HOME/.config/gogol/config as per the XDG spec.
 // TODO: custom flag for other config location.
 // TODO: default fallback when no config is present or human readable error.
 // TODO: Replace gcfg with something else.
